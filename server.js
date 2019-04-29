@@ -2,10 +2,15 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const MOVIES = require('./moviedex-data.json')
+const cors = require('cors')
+const helmet = require('helmet')
 const app = express()
 const PORT = 8000
 
 app.use(morgan('dev'))
+app.use(cors())
+app.use(helmet())
+
 
 app.use(function validateBearerToken(req,res,next) {
     const authToken = req.get('Authorization')
@@ -21,13 +26,13 @@ app.use(function validateBearerToken(req,res,next) {
 
 app.get('/movie', function handleGetMovie(req, res) {
     let response = MOVIES
-    //get genres case insenstive 
+    //get genres-case insenstive 
     if (req.query.genre) {
         response = response.filter(movies => 
             movies.genre.toLowerCase().includes(req.query.genre.toLowerCase())
         )
     }
-    //get country case insenstive 
+    //get country-case insenstive 
     if (req.query.country) {
         response = response.filter(movies => 
             movies.country.toLowerCase().includes(req.query.country.toLowerCase())
