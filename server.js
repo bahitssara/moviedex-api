@@ -1,11 +1,9 @@
 require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
+const MOVIES = require('./moviedex-data.json')
 const app = express()
 const PORT = 8000
-
-
-const validTypes = ['filmtv_ID', 'film_title', 'year', 'genre', 'duration', 'country', 'director', 'actors', 'avg_vote', 'votes']
 
 app.use(morgan('dev'))
 
@@ -22,7 +20,27 @@ app.use(function validateBearerToken(req,res,next) {
 })
 
 app.get('/movie', function handleGetMovie(req, res) {
-    res.json(validTypes)
+    let response = MOVIES
+    //get genres case insenstive 
+    if (req.query.genre) {
+        response = response.filter(movies => 
+            movies.genre.toLowerCase().includes(req.query.genre.toLowerCase())
+        )
+    }
+    //get country case insenstive 
+    if (req.query.country) {
+        response = response.filter(movies => 
+            movies.country.toLowerCase().includes(req.query.country.toLowerCase())
+        )
+    }
+    //get avg_votes that are greater than query/search  
+    if (req.query.avg_vote) {
+        response = response.filter(movies => 
+            Number(movies.avg_vote) >= Number(req.query.avg_vote)
+        )
+    }
+
+    res.json(response)
 })
 
 app.listen(PORT, () => {
