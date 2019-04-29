@@ -10,12 +10,12 @@ const validTypes = ['filmtv_ID', 'film_title', 'year', 'genre', 'duration', 'cou
 app.use(morgan('dev'))
 
 app.use(function validateBearerToken(req,res,next) {
-    const bearerToken = req.get('Authorization').split(' ')[1]
+    const authToken = req.get('Authorization')
     const apiToken = process.env.API_TOKEN
 
     console.log('validate bearer token')
 
-    if (bearerToken !== apiToken) {
+    if (!authToken || authToken.split(' ')[1] !== apiToken) {
         return res.status(401).json({error: 'Unauthorized request'})
     }
     next()
